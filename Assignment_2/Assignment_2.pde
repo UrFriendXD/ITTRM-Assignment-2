@@ -89,9 +89,11 @@ void draw () {
     Boid current = boids.get(i);
     if(current.isDead){
       boids.remove(i);
-    }
+    } else
+    {
     current.go();
     current.draw();
+    }
   }
 
   for (int i = 0; i <avoids.size(); i++) {
