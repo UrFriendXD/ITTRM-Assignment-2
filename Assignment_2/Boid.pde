@@ -68,6 +68,7 @@ class Boid {
       move.add(avoidObjects);
       move.add(noise);
       move.add(cohese);
+      move.mult(speed);
     } 
     
     // If the boid just spawn, go to the centre

@@ -118,10 +118,9 @@ void setupCircle() {
 
 
 void draw () {
-  background(#936AD6);
   noStroke();
   colorMode(HSB);
-  fill(0, 30);
+  fill(0, 100);
   rect(0, 0, width, height);
 
   for (int i = 0; i <boids.size(); i++) {
@@ -164,15 +163,23 @@ void keyPressed () {
 }
 
 void drawGUI() {
+  text(time, 100, 100);
+   textSize(20);
   if (messageTimer > 0) {
     fill((min(30, messageTimer) / 30.0) * 255.0);
     text(messageText, 10, height - 20);
   }
-  text(time, 100, 100);
-   textSize(20);
+   fill(#9FEBFA);
+   textSize(25);
+   text("1.Control pitch & speed of music via mouse position", 10, 150);
    
-   text("!Covid19: People entering room 5 in lvl 00 B11 since March!)",width/3,50);
+   fill(#F9FFE5);
    textSize(30);
+   textAlign(CENTER);
+   text("!Covid19: People entering room 5 in lvl 00 B11 since March!)", width/2, 50);
+   
+   textAlign(LEFT);
+   textSize(20);
 }
 
 String s(int count) {
