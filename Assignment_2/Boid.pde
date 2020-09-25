@@ -9,6 +9,9 @@ class Boid {
   int thinkTimer = 0;
   
   boolean isDead;
+  boolean toBeRemoved;
+  float chosenPosX;
+  float chosenPosY;
 
 
   Boid (float xx, float yy) {
@@ -40,10 +43,11 @@ class Boid {
     PVector noise = new PVector(random(2) - 1, random(2) -1);
     PVector cohese = getCohesion();
 
+if(!toBeRemoved){
     allign.mult(1);
     if (!option_friend) allign.mult(0);
     
-    avoidDir.mult(1);
+    avoidDir.mult(2);
     if (!option_crowd) avoidDir.mult(0);
     
     avoidObjects.mult(3);
@@ -62,6 +66,30 @@ class Boid {
     move.add(avoidObjects);
     move.add(noise);
     move.add(cohese);
+} else
+{
+  // Generate random values outside of the map
+  float randomX1 = - 10;
+  float randomY1 = random(0, height);
+  float randomX2 = width + 10;
+  float randomY2 = random(0, height);
+  float randomX3 = random(0, width);
+  float randomY3 = -10;
+  float randomX4 = random(0, width);
+  float randomY4 = height + 10;
+  float[] randomXPos = { randomX1, randomX2, randomX3, randomX4};
+    chosenPosX = randomXPos[int(random(randomXPos.length))];
+  float[] randomYPos = { randomY1, randomY2, randomY3, randomY4};
+  if (chosenPosX == randomX1 || chosenPosX == randomX2){
+   chosenPosY = randomYPos[int(random(2))];
+  } else{
+   chosenPosY = randomYPos[int(random(2, 4))];
+  }
+  
+  //float distToCentre = PVector.dist(pos, );
+  move.add(new PVector(chosenPosX, chosenPosY));
+}
+
 
     move.limit(maxSpeed);
     
@@ -83,6 +111,7 @@ class Boid {
     friends = nearby;
   }
 
+// Controls colour
   float getAverageColor () {
     float total = 0;
     float count = 0;
@@ -188,7 +217,7 @@ class Boid {
     for ( int i = 0; i < friends.size(); i++) {
       Boid f = friends.get(i);
       stroke(90);
-      //line(this.pos.x, this.pos.y, f.pos.x, f.pos.y);
+      line(this.pos.x, this.pos.y, f.pos.x, f.pos.y);
     }
     noStroke();
     fill(shade, 90, 200);
@@ -209,7 +238,13 @@ class Boid {
   }
 
   void wrap () {
-    pos.x = (pos.x + width) % width;
-    pos.y = (pos.y + height) % height;
+    if((pos.x + width) % width == 0)
+    {
+      isDead = true;
+    }
+    if ((pos.y + height) % height == 0)
+    {
+      isDead = true;
+    }
   }
 }
