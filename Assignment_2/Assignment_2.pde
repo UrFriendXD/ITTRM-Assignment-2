@@ -1,3 +1,12 @@
+import ddf.minim.*;
+import ddf.minim.spi.*; // for AudioRecordingStream
+import ddf.minim.ugens.*;
+
+//Audio
+Audio audio;
+Minim minim;
+float speed;
+
 //Boid barry;
 ArrayList<Boid> boids;
 ArrayList<Avoid> avoids;
@@ -24,8 +33,8 @@ int messageTimer = 0;
 String messageText = "";
 
 void setup () {
-  size(1024, 576);
-  textSize(16);
+  size(1920, 1080);
+  textSize(20);
   recalculateConstants();
   boids = new ArrayList<Boid>();
   avoids = new ArrayList<Avoid>();
@@ -37,11 +46,14 @@ void setup () {
   }
   
   setupCircle();
+  
+  minim = new Minim(this);
+  audio = new Audio();
 }
 
 // haha
 void recalculateConstants () {
-  maxSpeed = 2.1 * globalScale;
+  maxSpeed = (3 - speed);
   friendRadius = 60 * globalScale;
   crowdRadius = (friendRadius / 1.3);
   avoidRadius = 90 * globalScale;
@@ -58,7 +70,7 @@ void setupWalls() {
 }
 
 void setupCircle() {
-  avoids = new ArrayList<Avoid>();
+   avoids = new ArrayList<Avoid>();
    for (int x = 0; x < 50; x+= 1) {
      float dir = (x / 50.0) * TWO_PI;
     avoids.add(new Avoid(width * 0.5 + cos(dir) * height*.4, height * 0.5 + sin(dir)*height*.4));
@@ -67,9 +79,10 @@ void setupCircle() {
 
 
 void draw () {
+  background(#936AD6);
   noStroke();
   colorMode(HSB);
-  fill(0, 100);
+  fill(0, 30);
   rect(0, 0, width, height);
 
 
@@ -106,6 +119,8 @@ void draw () {
     messageTimer -= 1; 
   }
   drawGUI();
+  
+  audio.draw();
 }
 
 void keyPressed () {
@@ -133,10 +148,10 @@ void keyPressed () {
   } else if (key == '3') {
      option_avoid = option_avoid ? false : true;
      message("Turned obstacle avoidance " + on(option_avoid));
-  }else if (key == '4') {
+  } else if (key == '4') {
      option_cohese = option_cohese ? false : true;
      message("Turned cohesion " + on(option_cohese));
-  }else if (key == '5') {
+  } else if (key == '5') {
      option_noise = option_noise ? false : true;
      message("Turned noise " + on(option_noise));
   } else if (key == ',') {
@@ -154,6 +169,14 @@ void drawGUI() {
 
     text(messageText, 10, height - 20); 
    }
+   fill(#9FEBFA);
+   text("Control pitch & speed of music via mouse position",10,100);
+   
+   fill(#000000);
+   textSize(30);
+   text("!Covid19: People entering room 5 in lvl 00 B11 since March!)",width/3,50);
+   
+   textSize(20);
 }
 
 String s(int count) {
