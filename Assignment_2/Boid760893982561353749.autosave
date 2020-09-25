@@ -8,9 +8,12 @@ class Boid {
   // timers
   int thinkTimer = 0;
 
+  // Spawning variables
   boolean isDead;
   boolean toBeRemoved;
   boolean spawned;
+  
+  
   float chosenPosX;
   float chosenPosY;
 
@@ -166,6 +169,7 @@ class Boid {
 
   PVector getAvoidAvoids() {
     PVector steer = new PVector(0, 0);
+    int count = 0;
 
     for (Avoid other : avoids) {
       float d = PVector.dist(pos, other.pos);
@@ -176,12 +180,14 @@ class Boid {
         diff.normalize();
         diff.div(d);        // Weight by distance
         steer.add(diff);
+        count++;            // Keep track of how many
       }
     }
     return steer;
   }
 
   PVector getCohesion () {
+    float neighbordist = 50;
     PVector sum = new PVector(0, 0);   // Start with empty vector to accumulate all locations
     int count = 0;
     for (Boid other : friends) {
@@ -227,7 +233,11 @@ class Boid {
   }
 
   void wrap () {
-    if (pos.x > width + 10 || pos.x < 0 - 10 || pos.y > height + 10 || pos.y < 0 - 10)
+    if ((pos.x + width) % width == 0)
+    {
+      isDead = true;
+    }
+    if ((pos.y + height) % height == 0)
     {
       isDead = true;
     }
