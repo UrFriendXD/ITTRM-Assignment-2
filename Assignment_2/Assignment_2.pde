@@ -1,5 +1,8 @@
+import controlP5.*;
+
 Boid barry;
 ArrayList<Boid> boids;
+ArrayList<Boid> removedBoids;
 ArrayList<Avoid> avoids;
 
 float globalScale = .91;
@@ -23,20 +26,66 @@ boolean option_cohese = true;
 int messageTimer = 0;
 String messageText = "";
 
+// table and time stuff
+Table data;
+int index = 1; //row of the table
+int x = 0;
+int y = 0;
+boolean isOverUI = false;
+String time = " ";
+
+
+//UI stuff
+ControlP5 cp5;
+
 void setup () {
   size(1024, 576);
   textSize(16);
+  data = loadTable("peopleCount.csv", "csv" );
+  time = data.getString(index, 0);
   recalculateConstants();
   boids = new ArrayList<Boid>();
+  removedBoids = new ArrayList<Boid>();
   avoids = new ArrayList<Avoid>();
-  for (int x = 100; x < width - 100; x+= 100) {
-    for (int y = 100; y < height - 100; y+= 100) {
-      // boids.add(new Boid(x + random(3), y + random(3)));
-      //   boids.add(new Boid(x + random(3), y + random(3)));
+  y = data.getInt(index, 1);
+  for (int i = 0; i < y; i++) {
+    boids.add(new Boid(random(width), random(height)));
+  }
+  cp5 = new ControlP5(this);
+  cp5.addButton("Next").setValue(0).setPosition(800, 400).setSize(100, 100);
+  cp5.addButton("Previous").setValue(0).setPosition(125, 400).setSize(100, 100);
+  setupCircle();
+}
+
+//method for button "Next"
+public void Next() {
+  index++;
+  println(index);
+  changeTime();
+}
+
+//method for button "Previous"
+public void Previous() {
+  index--;
+  time = data.getString(index, 0);
+  println(time);
+  changeTime();
+}
+void changeTime() {
+  x = data.getInt(index, 0);
+  y = data.getInt(index, 1);
+  float difference = y - boids.size();
+  println(difference);
+  if (difference > 0) {
+    for (int i = 0; i < difference; i++) {
+      Boid first = new Boid(random(width), random(height));
+      boids.add(first);
+    }
+  } else if (difference < 0) {
+    for (int i = 0; i > difference; i--) {
+      erase();
     }
   }
-
-  setupCircle();
 }
 
 // haha
@@ -65,15 +114,24 @@ void draw () {
 
   for (int i = 0; i <boids.size(); i++) {
     Boid current = boids.get(i);
-    barry = current;
     if (current.isDead) 
     {
       boids.remove(i);
+      removedBoids.remove(current);
     } 
-
     current.go();
     current.draw();
   }
+
+  //for (int i = 0; i <removedBoids.size(); i++) {
+  //  Boid current = boids.get(i);
+  //  if (current.isDead) 
+  //  {
+  //    boids.remove(i);
+  //  } 
+  //  current.go();
+  //  current.draw();
+  //}
 
   for (int i = 0; i <avoids.size(); i++) {
     Avoid current = avoids.get(i);
@@ -94,9 +152,9 @@ void keyPressed () {
 void drawGUI() {
   if (messageTimer > 0) {
     fill((min(30, messageTimer) / 30.0) * 255.0);
-
     text(messageText, 10, height - 20);
   }
+  text(time, 100, 100);
 }
 
 String s(int count) {
@@ -108,10 +166,15 @@ String on(boolean in) {
 }
 
 void mousePressed () {
+  // If mouse is over UI, prevents boid spawning
+  if (cp5.isMouseOver()) {
+    return;
+  }
   // Adds boid on left, remove random on right
   switch (mouseButton) {
   case LEFT:
-    boids.add(new Boid(mouseX, mouseY));
+    Boid newBoid = new Boid(mouseX, mouseY);
+    boids.add(newBoid);
     message(boids.size() + " Total Boid" + s(boids.size()));
     break;
   case RIGHT:
@@ -122,10 +185,15 @@ void mousePressed () {
 
 // Sets a random boid to be deleted
 void erase () {
-  if (boids.size() > 0 ) {
+  if (boids.size() > 0 ) 
+  {
     int index = int(random(boids.size()));
-    if (boids.get(index).toBeRemoved == false)
-      boids.get(index).toBeRemoved = true;
+    Boid randomBoid = boids.get(index);
+    if (randomBoid.toBeRemoved == false && !removedBoids.contains(randomBoid))
+    {
+      randomBoid.toBeRemoved = true;
+      removedBoids.add(randomBoid);
+    }
   }
 }
 
