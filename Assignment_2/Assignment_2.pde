@@ -79,10 +79,9 @@ void setupCircle() {
 
 
 void draw () {
-  background(#936AD6);
   noStroke();
   colorMode(HSB);
-  fill(0, 30);
+  fill(0, 100);
   rect(0, 0, width, height);
 
 
@@ -170,12 +169,15 @@ void drawGUI() {
     text(messageText, 10, height - 20); 
    }
    fill(#9FEBFA);
-   text("Control pitch & speed of music via mouse position",10,100);
+   textSize(25);
+   text("1.Control pitch & speed of music via mouse position", 10, 150);
    
-   fill(#000000);
+   fill(#F9FFE5);
    textSize(30);
-   text("!Covid19: People entering room 5 in lvl 00 B11 since March!)",width/3,50);
+   textAlign(CENTER);
+   text("!Covid19: People entering room 5 in lvl 00 B11 since March!)", width/2, 50);
    
+   textAlign(LEFT);
    textSize(20);
 }
 

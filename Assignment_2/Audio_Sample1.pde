@@ -30,7 +30,7 @@ class Audio {
   void draw()
   {
     // change the rate control value based on mouse position
-    speed = map(mouseX, 0, width, 0.0f, 3.f); //convert to slider instead
+    speed = map(mouseX, 0, width, 1.f, 3.f); //convert to slider instead
   
     speedControl.value.setLastValue(speed);
   }
