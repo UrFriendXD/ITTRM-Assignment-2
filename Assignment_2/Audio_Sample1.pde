@@ -29,8 +29,8 @@ class Audio {
    
   void draw()
   {
-    // change the rate control value based on mouse position
-    speed = map(mouseX, 0, width, 0.5f, 3.f); //convert to slider instead
+    // change the speed and pitch control value based on mouse position
+    speed = map(mouseX, 0, width, 0.5f, 3.5f);
   
     speedControl.value.setLastValue(speed);
   }

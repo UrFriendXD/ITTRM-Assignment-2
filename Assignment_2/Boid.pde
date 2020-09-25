@@ -46,6 +46,7 @@ class Boid {
     PVector cohese = getCohesion();
 
     if (!toBeRemoved && !spawned) {
+      
       allign.mult(1);
       if (!option_friend) allign.mult(0);
 
@@ -62,13 +63,13 @@ class Boid {
       if (!option_cohese) cohese.mult(0);
 
       stroke(0, 255, 160);
-
+      
+      move.mult(speed);
       move.add(allign);
       move.add(avoidDir);
       move.add(avoidObjects);
       move.add(noise);
       move.add(cohese);
-      move.mult(speed);
     } 
     
     // If the boid just spawn, go to the centre
