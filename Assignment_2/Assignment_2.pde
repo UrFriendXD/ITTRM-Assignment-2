@@ -53,7 +53,7 @@ void setup () {
 
 // haha
 void recalculateConstants () {
-  maxSpeed = (3 - speed);
+  maxSpeed = (4 - speed);
   friendRadius = 60 * globalScale;
   crowdRadius = (friendRadius / 1.3);
   avoidRadius = 90 * globalScale;
