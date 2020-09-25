@@ -24,6 +24,7 @@ class Boid {
     shade = random(255);
     friends = new ArrayList<Boid>();
     spawned = true;
+    toBeRemoved = false;
   }
 
   void go () {
@@ -46,7 +47,7 @@ class Boid {
     PVector cohese = getCohesion();
 
     if (!toBeRemoved && !spawned) {
-      
+
       allign.mult(1);
       if (!option_friend) allign.mult(0);
 
@@ -63,7 +64,7 @@ class Boid {
       if (!option_cohese) cohese.mult(0);
 
       stroke(0, 255, 160);
-      
+
       move.mult(speed);
       move.add(allign);
       move.add(avoidDir);
@@ -71,20 +72,20 @@ class Boid {
       move.add(noise);
       move.add(cohese);
     } 
-    
+
     // If the boid just spawn, go to the centre
-    if (spawned){
-      
+    if (spawned) {
+
       // If they reach a certain radius to the centre, they follow normal behaviour
       float distToCentre = PVector.dist(pos, new PVector(width/2, height/2));
-      if(distToCentre < 200f){
-         spawned = false; 
+      if (distToCentre < 200f) {
+        spawned = false;
       }
       float vectorX = width/2 - pos.x;
       float vectorY = height/2 - pos.y;
       move.add(vectorX, vectorY);
     }
-    
+
     move.limit(maxSpeed);
 
     shade += getAverageColor() * 0.03;
@@ -144,6 +145,7 @@ class Boid {
     return sum;
   }
 
+  // Flocking avoidance
   PVector getAvoidDir() {
     PVector steer = new PVector(0, 0);
     int count = 0;
@@ -166,6 +168,7 @@ class Boid {
     return steer;
   }
 
+  // PVector for avoiding avoid objects
   PVector getAvoidAvoids() {
     PVector steer = new PVector(0, 0);
 
@@ -183,6 +186,7 @@ class Boid {
     return steer;
   }
 
+  // Flocking cohesion
   PVector getCohesion () {
     PVector sum = new PVector(0, 0);   // Start with empty vector to accumulate all locations
     int count = 0;
@@ -211,7 +215,14 @@ class Boid {
     //  line(this.pos.x, this.pos.y, f.pos.x, f.pos.y);
     //}
     noStroke();
-    fill(shade, 90, 200);
+
+    // Change colour to red if removed
+    if (!toBeRemoved)
+    {
+      fill(shade, 90, 200);
+    } else
+      fill(#EA0909);
+
     pushMatrix();
     translate(pos.x, pos.y);
     rotate(move.heading());
@@ -229,6 +240,7 @@ class Boid {
   }
 
   void wrap () {
+    // Check if out of screen
     if (pos.x > width + 10 || pos.x < 0 - 10 || pos.y > height + 10 || pos.y < 0 - 10)
     {
       isDead = true;
