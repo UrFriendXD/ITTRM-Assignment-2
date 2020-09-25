@@ -1,6 +1,14 @@
 import controlP5.*;
 
-Boid barry;
+//Audio
+Audio audio;
+Minim minim;
+float speed;
+
+import ddf.minim.*;
+import ddf.minim.spi.*; // for AudioRecordingStream
+import ddf.minim.ugens.*;
+
 ArrayList<Boid> boids;
 ArrayList<Boid> removedBoids;
 ArrayList<Avoid> avoids;
@@ -39,7 +47,7 @@ String time = " ";
 ControlP5 cp5;
 
 void setup () {
-  size(1024, 576);
+  size(1920, 1080);
   textSize(16);
   data = loadTable("peopleCount.csv", "csv" );
   time = data.getString(index, 0);
@@ -55,6 +63,9 @@ void setup () {
   cp5.addButton("Next").setValue(0).setPosition(800, 400).setSize(100, 100);
   cp5.addButton("Previous").setValue(0).setPosition(125, 400).setSize(100, 100);
   setupCircle();
+  
+  minim = new Minim(this);
+  audio = new Audio();
 }
 
 //method for button "Next"
@@ -90,7 +101,7 @@ void changeTime() {
 
 // haha
 void recalculateConstants () {
-  maxSpeed = 2.1 * globalScale;
+  maxSpeed = (3 - speed);
   friendRadius = 60 * globalScale;
   crowdRadius = (friendRadius / 1.3);
   avoidRadius = 90 * globalScale;
@@ -107,9 +118,10 @@ void setupCircle() {
 
 
 void draw () {
+  background(#936AD6);
   noStroke();
   colorMode(HSB);
-  fill(0, 100);
+  fill(0, 30);
   rect(0, 0, width, height);
 
   for (int i = 0; i <boids.size(); i++) {
@@ -143,6 +155,8 @@ void draw () {
     messageTimer -= 1;
   }
   drawGUI();
+  
+  audio.draw();
 }
 
 void keyPressed () {
@@ -155,6 +169,10 @@ void drawGUI() {
     text(messageText, 10, height - 20);
   }
   text(time, 100, 100);
+   textSize(20);
+   
+   text("!Covid19: People entering room 5 in lvl 00 B11 since March!)",width/3,50);
+   textSize(30);
 }
 
 String s(int count) {
