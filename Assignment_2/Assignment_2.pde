@@ -1,3 +1,5 @@
+import controlP5.*;
+
 Boid barry;
 ArrayList<Boid> boids;
 ArrayList<Avoid> avoids;
@@ -23,22 +25,62 @@ boolean option_cohese = true;
 int messageTimer = 0;
 String messageText = "";
 
+// table stuff
+Table data;
+int index = 1; //row of the table
+int x = 0;
+int y = 0;
+boolean isOverUI = false;
+//CP5 stuff
+ControlP5 cp5;
+
 void setup () {
   size(1024, 576);
   textSize(16);
+  data = loadTable("peopleCount.csv", "csv" );
   recalculateConstants();
   boids = new ArrayList<Boid>();
   avoids = new ArrayList<Avoid>();
-  for (int x = 100; x < width - 100; x+= 100) {
-    for (int y = 100; y < height - 100; y+= 100) {
-      // boids.add(new Boid(x + random(3), y + random(3)));
-      //   boids.add(new Boid(x + random(3), y + random(3)));
-    }
+  y = data.getInt(index, 1);
+  for (int i = 0; i < y ; i++) {
+       boids.add(new Boid(random(width), random(height)));       
   }
-
+  cp5 = new ControlP5(this);
+  cp5.addButton("Next").setValue(0).setPosition(800,400).setSize(100,100);
+  cp5.addButton("Previous").setValue(0).setPosition(125,400).setSize(100,100);
   setupCircle();
 }
 
+//method for button "Next"
+public void Next() {
+  index++;
+  println(index);
+  changeTime(); 
+}
+
+//method for button "Previous"
+public void Previous() {
+  index--;
+  println(index);
+  changeTime();
+}
+void changeTime() {
+  x = data.getInt(index, 0);
+  y = data.getInt(index, 1);
+  float difference = y - boids.size();
+  println(difference);
+  if (difference > 0) {
+    for (int i = 0; i < difference; i++) {
+      boids.add(new Boid(random(width), random(height)));
+    }
+  }
+  else if (difference < 0) {
+    for (int i = 0; i < difference; i--) {
+      erase();
+    }
+  }
+  
+}
 // haha
 void recalculateConstants () {
   maxSpeed = 2.1 * globalScale;
@@ -108,6 +150,10 @@ String on(boolean in) {
 }
 
 void mousePressed () {
+  // If mouse is over UI, prevents boid spawning
+    if (cp5.isMouseOver()) {
+    return;
+  }
   // Adds boid on left, remove random on right
   switch (mouseButton) {
   case LEFT:
