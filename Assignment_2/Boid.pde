@@ -8,11 +8,11 @@ class Boid {
   // timers
   int thinkTimer = 0;
 
+  //Bools 
   boolean isDead;
   boolean toBeRemoved;
   boolean spawned;
-  float chosenPosX;
-  float chosenPosY;
+
 
 
   Boid (float xx, float yy) {
@@ -39,13 +39,16 @@ class Boid {
     pos.add(move);
   }
 
+  // Main flocking function
   void flock () {
+    // Gets all flocking cores 
     PVector allign = getAverageDir();
     PVector avoidDir = getAvoidDir(); 
     PVector avoidObjects = getAvoidAvoids();
     PVector noise = new PVector(random(2) - 1, random(2) -1);
     PVector cohese = getCohesion();
 
+    // Enter normal state if not just spawn or flaged for removal
     if (!toBeRemoved && !spawned) {
 
       allign.mult(1);
@@ -65,6 +68,7 @@ class Boid {
 
       stroke(0, 255, 160);
 
+      // Add all vectors too movement 
       move.mult(speed);
       move.add(allign);
       move.add(avoidDir);
@@ -81,8 +85,11 @@ class Boid {
       if (distToCentre < 200f) {
         spawned = false;
       }
+
       float vectorX = width/2 - pos.x;
       float vectorY = height/2 - pos.y;
+
+      // Add vector toward centre
       move.add(vectorX, vectorY);
     }
 
@@ -93,6 +100,7 @@ class Boid {
     shade = (shade + 255) % 255; //max(0, min(255, shade));
   }
 
+  // Get all boids nearby
   void getFriends () {
     ArrayList<Boid> nearby = new ArrayList<Boid>();
     for (int i =0; i < boids.size(); i++) {
@@ -124,6 +132,7 @@ class Boid {
     return total / (float) count;
   }
 
+  // Flocking movement direction
   PVector getAverageDir () {
     PVector sum = new PVector(0, 0);
     int count = 0;

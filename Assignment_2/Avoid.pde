@@ -2,6 +2,7 @@ class Avoid {
    PVector pos;
    color fillColour;
    
+   //Constructor
    Avoid (float xx, float yy, color colour) {
      pos = new PVector(xx,yy);
      fillColour = colour;
