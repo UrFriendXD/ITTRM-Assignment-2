@@ -25,19 +25,23 @@ boolean option_cohese = true;
 int messageTimer = 0;
 String messageText = "";
 
-// table stuff
+// table and time stuff
 Table data;
 int index = 1; //row of the table
 int x = 0;
 int y = 0;
 boolean isOverUI = false;
-//CP5 stuff
+String time = " ";
+
+
+//UI stuff
 ControlP5 cp5;
 
 void setup () {
   size(1024, 576);
   textSize(16);
   data = loadTable("peopleCount.csv", "csv" );
+  time = data.getString(index, 0);
   recalculateConstants();
   boids = new ArrayList<Boid>();
   avoids = new ArrayList<Avoid>();
@@ -54,14 +58,16 @@ void setup () {
 //method for button "Next"
 public void Next() {
   index++;
-  println(index);
+  time = data.getString(index, 0);
+  println(time);
   changeTime(); 
 }
 
 //method for button "Previous"
 public void Previous() {
   index--;
-  println(index);
+  time = data.getString(index, 0);
+  println(time);
   changeTime();
 }
 void changeTime() {
@@ -136,9 +142,9 @@ void keyPressed () {
 void drawGUI() {
   if (messageTimer > 0) {
     fill((min(30, messageTimer) / 30.0) * 255.0);
-
     text(messageText, 10, height - 20);
   }
+  text(time, 100, 100);
 }
 
 String s(int count) {
