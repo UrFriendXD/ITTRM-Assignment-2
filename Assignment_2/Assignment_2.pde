@@ -2,6 +2,7 @@ import controlP5.*;
 
 Boid barry;
 ArrayList<Boid> boids;
+ArrayList<Boid> removedBoids;
 ArrayList<Avoid> avoids;
 
 float globalScale = .91;
@@ -44,23 +45,23 @@ void setup () {
   time = data.getString(index, 0);
   recalculateConstants();
   boids = new ArrayList<Boid>();
+  removedBoids = new ArrayList<Boid>();
   avoids = new ArrayList<Avoid>();
   y = data.getInt(index, 1);
-  for (int i = 0; i < y ; i++) {
-       boids.add(new Boid(random(width), random(height)));       
+  for (int i = 0; i < y; i++) {
+    boids.add(new Boid(random(width), random(height)));
   }
   cp5 = new ControlP5(this);
-  cp5.addButton("Next").setValue(0).setPosition(800,400).setSize(100,100);
-  cp5.addButton("Previous").setValue(0).setPosition(125,400).setSize(100,100);
+  cp5.addButton("Next").setValue(0).setPosition(800, 400).setSize(100, 100);
+  cp5.addButton("Previous").setValue(0).setPosition(125, 400).setSize(100, 100);
   setupCircle();
 }
 
 //method for button "Next"
 public void Next() {
   index++;
-  time = data.getString(index, 0);
-  println(time);
-  changeTime(); 
+  println(index);
+  changeTime();
 }
 
 //method for button "Previous"
@@ -77,16 +78,16 @@ void changeTime() {
   println(difference);
   if (difference > 0) {
     for (int i = 0; i < difference; i++) {
-      boids.add(new Boid(random(width), random(height)));
+      Boid first = new Boid(random(width), random(height));
+      boids.add(first);
     }
-  }
-  else if (difference < 0) {
-    for (int i = 0; i < difference; i--) {
+  } else if (difference < 0) {
+    for (int i = 0; i > difference; i--) {
       erase();
     }
   }
-  
 }
+
 // haha
 void recalculateConstants () {
   maxSpeed = 2.1 * globalScale;
@@ -113,15 +114,24 @@ void draw () {
 
   for (int i = 0; i <boids.size(); i++) {
     Boid current = boids.get(i);
-    barry = current;
     if (current.isDead) 
     {
       boids.remove(i);
+      removedBoids.remove(current);
     } 
-
     current.go();
     current.draw();
   }
+
+  //for (int i = 0; i <removedBoids.size(); i++) {
+  //  Boid current = boids.get(i);
+  //  if (current.isDead) 
+  //  {
+  //    boids.remove(i);
+  //  } 
+  //  current.go();
+  //  current.draw();
+  //}
 
   for (int i = 0; i <avoids.size(); i++) {
     Avoid current = avoids.get(i);
@@ -157,13 +167,14 @@ String on(boolean in) {
 
 void mousePressed () {
   // If mouse is over UI, prevents boid spawning
-    if (cp5.isMouseOver()) {
+  if (cp5.isMouseOver()) {
     return;
   }
   // Adds boid on left, remove random on right
   switch (mouseButton) {
   case LEFT:
-    boids.add(new Boid(mouseX, mouseY));
+    Boid newBoid = new Boid(mouseX, mouseY);
+    boids.add(newBoid);
     message(boids.size() + " Total Boid" + s(boids.size()));
     break;
   case RIGHT:
@@ -174,10 +185,15 @@ void mousePressed () {
 
 // Sets a random boid to be deleted
 void erase () {
-  if (boids.size() > 0 ) {
+  if (boids.size() > 0 ) 
+  {
     int index = int(random(boids.size()));
-    if (boids.get(index).toBeRemoved == false)
-      boids.get(index).toBeRemoved = true;
+    Boid randomBoid = boids.get(index);
+    if (randomBoid.toBeRemoved == false && !removedBoids.contains(randomBoid))
+    {
+      randomBoid.toBeRemoved = true;
+      removedBoids.add(randomBoid);
+    }
   }
 }
 
