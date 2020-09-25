@@ -7,9 +7,10 @@ class Boid {
 
   // timers
   int thinkTimer = 0;
-  
+
   boolean isDead;
   boolean toBeRemoved;
+  boolean spawned;
   float chosenPosX;
   float chosenPosY;
 
@@ -22,6 +23,7 @@ class Boid {
     thinkTimer = int(random(10));
     shade = random(255);
     friends = new ArrayList<Boid>();
+    spawned = true;
   }
 
   void go () {
@@ -43,56 +45,46 @@ class Boid {
     PVector noise = new PVector(random(2) - 1, random(2) -1);
     PVector cohese = getCohesion();
 
-if(!toBeRemoved){
-    allign.mult(1);
-    if (!option_friend) allign.mult(0);
+    if (!toBeRemoved && !spawned) {
+      allign.mult(1);
+      if (!option_friend) allign.mult(0);
+
+      avoidDir.mult(2);
+      if (!option_crowd) avoidDir.mult(0);
+
+      avoidObjects.mult(3);
+      if (!option_avoid) avoidObjects.mult(0);
+
+      noise.mult(0.1);
+      if (!option_noise) noise.mult(0);
+
+      cohese.mult(1);
+      if (!option_cohese) cohese.mult(0);
+
+      stroke(0, 255, 160);
+
+      move.add(allign);
+      move.add(avoidDir);
+      move.add(avoidObjects);
+      move.add(noise);
+      move.add(cohese);
+    } 
     
-    avoidDir.mult(2);
-    if (!option_crowd) avoidDir.mult(0);
+    // If the boid just spawn, go to the centre
+    if (spawned){
+      
+      // If they reach a certain radius to the centre, they follow normal behaviour
+      float distToCentre = PVector.dist(pos, new PVector(width/2, height/2));
+      if(distToCentre < 200f){
+         spawned = false; 
+      }
+      float vectorX = width/2 - pos.x;
+      float vectorY = height/2 - pos.y;
+      move.add(vectorX, vectorY);
+    }
     
-    avoidObjects.mult(3);
-    if (!option_avoid) avoidObjects.mult(0);
-
-    noise.mult(0.1);
-    if (!option_noise) noise.mult(0);
-
-    cohese.mult(1);
-    if (!option_cohese) cohese.mult(0);
-    
-    stroke(0, 255, 160);
-
-    move.add(allign);
-    move.add(avoidDir);
-    move.add(avoidObjects);
-    move.add(noise);
-    move.add(cohese);
-} else
-{
-  // Generate random values outside of the map
-  float randomX1 = - 10;
-  float randomY1 = random(0, height);
-  float randomX2 = width + 10;
-  float randomY2 = random(0, height);
-  float randomX3 = random(0, width);
-  float randomY3 = -10;
-  float randomX4 = random(0, width);
-  float randomY4 = height + 10;
-  float[] randomXPos = { randomX1, randomX2, randomX3, randomX4};
-    chosenPosX = randomXPos[int(random(randomXPos.length))];
-  float[] randomYPos = { randomY1, randomY2, randomY3, randomY4};
-  if (chosenPosX == randomX1 || chosenPosX == randomX2){
-   chosenPosY = randomYPos[int(random(2))];
-  } else{
-   chosenPosY = randomYPos[int(random(2, 4))];
-  }
-  
-  //float distToCentre = PVector.dist(pos, );
-  move.add(new PVector(chosenPosX, chosenPosY));
-}
-
-
     move.limit(maxSpeed);
-    
+
     shade += getAverageColor() * 0.03;
     shade += (random(2) - 1) ;
     shade = (shade + 255) % 255; //max(0, min(255, shade));
@@ -111,7 +103,7 @@ if(!toBeRemoved){
     friends = nearby;
   }
 
-// Controls colour
+  // Controls colour
   float getAverageColor () {
     float total = 0;
     float count = 0;
@@ -121,7 +113,7 @@ if(!toBeRemoved){
       } else if (other.shade - shade > 128) {
         total += other.shade - 255 - shade;
       } else {
-        total += other.shade - shade; 
+        total += other.shade - shade;
       }
       count++;
     }
@@ -190,9 +182,9 @@ if(!toBeRemoved){
     }
     return steer;
   }
-  
+
   PVector getCohesion () {
-   float neighbordist = 50;
+    float neighbordist = 50;
     PVector sum = new PVector(0, 0);   // Start with empty vector to accumulate all locations
     int count = 0;
     for (Boid other : friends) {
@@ -204,21 +196,21 @@ if(!toBeRemoved){
     }
     if (count > 0) {
       sum.div(count);
-      
+
       PVector desired = PVector.sub(sum, pos);  
       return desired.setMag(0.05);
-    } 
-    else {
+    } else {
       return new PVector(0, 0);
     }
   }
 
   void draw () {
-    for ( int i = 0; i < friends.size(); i++) {
-      Boid f = friends.get(i);
-      stroke(90);
-      line(this.pos.x, this.pos.y, f.pos.x, f.pos.y);
-    }
+    // Draws lines between friends. Used for debug
+    //for ( int i = 0; i < friends.size(); i++) {
+    //  Boid f = friends.get(i);
+    //  stroke(90);
+    //  line(this.pos.x, this.pos.y, f.pos.x, f.pos.y);
+    //}
     noStroke();
     fill(shade, 90, 200);
     pushMatrix();
@@ -238,7 +230,7 @@ if(!toBeRemoved){
   }
 
   void wrap () {
-    if((pos.x + width) % width == 0)
+    if ((pos.x + width) % width == 0)
     {
       isDead = true;
     }
